@@ -2,7 +2,7 @@ import copy
 import math
 import unittest
 
-from lab import cases, load_agent, metrics, predict, read_json, validate_input
+from lab import MODEL_NAMES, cases, evaluate, load_agent, metrics, predict, read_json, validate_input
 
 
 class LabChecks(unittest.TestCase):
@@ -56,6 +56,21 @@ class LabChecks(unittest.TestCase):
         self.assertEqual(result["refund_accuracy_threshold_0_5"], 1)
         self.assertEqual(result["latency_p50_ms"], 20)
         self.assertEqual(result["latency_p95_ms"], 29)
+
+    def test_comparison_keeps_original_cases_and_model_revision(self):
+        english = cases("en")
+        self.assertEqual(len(english), 10)
+        self.assertEqual(english, [row for row in cases() if row["language"] == "en"])
+        registry = read_json("models.lock.json")
+        self.assertEqual(set(registry), set(MODEL_NAMES))
+        self.assertEqual(registry["multilingual"], read_json("model.lock.json"))
+        self.assertEqual(len({m["revision"] for m in registry.values()}), 1)
+
+    def test_english_models_reject_multilingual_evaluation(self):
+        for model in ("english", "typed-decisions"):
+            for language in ("all", "es", "pt"):
+                with self.subTest(model=model, language=language), self.assertRaisesRegex(ValueError, "English-only"):
+                    evaluate("cpu", "unused.json", model=model, language=language)
 
 
 if __name__ == "__main__":

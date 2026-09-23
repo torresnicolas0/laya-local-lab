@@ -1,0 +1,56 @@
+{
+  "device": "cpu",
+  "language": "en",
+  "inputs_per_model": 10,
+  "separate_sequential_processes": true,
+  "model_order": [
+    "multilingual",
+    "english",
+    "typed-decisions"
+  ],
+  "memory_scope": "Peak process RSS, not total unified/GPU memory",
+  "models": {
+    "multilingual": {
+      "n": 10,
+      "department_correct": 6,
+      "department_accuracy": 0.6,
+      "majority_department_baseline": 0.3,
+      "urgency_mae_0_to_2": 0.81432,
+      "refund_accuracy_threshold_0_5": 0.6,
+      "refund_always_no_baseline": 0.8,
+      "refund_brier": 0.203504535,
+      "latency_p50_ms": 124.95699996361509,
+      "latency_p95_ms": 132.740429462865,
+      "load_seconds": 6.402677792008035,
+      "process_peak_rss_mib": 2200.078125
+    },
+    "english": {
+      "n": 10,
+      "department_correct": 9,
+      "department_accuracy": 0.9,
+      "majority_department_baseline": 0.3,
+      "urgency_mae_0_to_2": 0.13088000000000002,
+      "refund_accuracy_threshold_0_5": 0.9,
+      "refund_always_no_baseline": 0.8,
+      "refund_brier": 0.058794526,
+      "latency_p50_ms": 267.0649370411411,
+      "latency_p95_ms": 293.4655894292518,
+      "load_seconds": 4.050803915946744,
+      "process_peak_rss_mib": 2838.25
+    },
+    "typed-decisions": {
+      "n": 10,
+      "department_correct": 10,
+      "department_accuracy": 1.0,
+      "majority_department_baseline": 0.3,
+      "urgency_mae_0_to_2": 0.26259,
+      "refund_accuracy_threshold_0_5": 1.0,
+      "refund_always_no_baseline": 0.8,
+      "refund_brier": 0.038435816,
+      "latency_p50_ms": 280.3803750430234,
+      "latency_p95_ms": 295.14183923602104,
+      "load_seconds": 3.8109285419341177,
+      "process_peak_rss_mib": 2830.4375
+    }
+  }
+}

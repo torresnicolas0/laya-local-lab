@@ -1,0 +1,51 @@
+{
+  "models": {
+    "multilingual": {
+      "all_ten_cpu_offline_outputs_identical": true,
+      "all_ten_cpu_mps_categories_identical": true,
+      "offline_network_proof": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    },
+    "english": {
+      "all_ten_cpu_offline_outputs_identical": true,
+      "all_ten_cpu_mps_categories_identical": true,
+      "offline_network_proof": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    },
+    "typed-decisions": {
+      "all_ten_cpu_offline_outputs_identical": true,
+      "all_ten_cpu_mps_categories_identical": true,
+      "offline_network_proof": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    }
+  },
+  "original_files_unchanged": [
+    "cases.json",
+    "questions.json",
+    "model.lock.json",
+    "RESULTADOS.md",
+    "results/cpu.json",
+    "results/mps.json",
+    "results/cpu-repro-offline.json",
+    "results/verification.json"
+  ],
+  "original_commit": "22024e4d79e730e27c3658e065f71d7fb734cbb8",
+  "all_current_comparison_hashes_verified": true,
+  "unit_tests": {
+    "passed": 6,
+    "command": ".venv/bin/python -m unittest -v"
+  },
+  "ui_checks": {
+    "streamlit_apptest": [
+      "real CPU inference for all three models",
+      "30 multilingual examples and 10 examples per English model",
+      "stale result cleared on model change",
+      "empty input rejected",
+      "legacy session state migrated"
+    ],
+    "browser": {
+      "model": "typed-decisions",
+      "case": "04_negated_refund_en",
+      "department": "billing",
+      "refund_percent": 15.7,
+      "screenshot": "docs/comparison.png"
+    }
+  }
+}

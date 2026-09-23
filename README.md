@@ -1,8 +1,10 @@
 # Laya local lab
 
-Una prueba reproducible de [Laya](https://github.com/NandhaKishorM/laya) en un Mac M1 Max: clasificar solicitudes, puntuar urgencia y detectar peticiones de devolución. Todo el texto es sintético; la inferencia se ejecuta localmente.
+Una comparación reproducible de tres variantes de [Laya](https://github.com/NandhaKishorM/laya) en un Mac M1 Max: clasificar solicitudes, puntuar urgencia y detectar peticiones de devolución. Todo el texto es sintético; la inferencia se ejecuta localmente.
 
-**Resultado:** 18/30 clasificaciones correctas. La GPU redujo la mediana de 126 a 33 ms por solicitud, pero no corrigió los errores semánticos. [Resultados y límites](RESULTADOS.md).
+**Comparación en inglés:** Multilingual acertó 6/10 departamentos, Laya base 9/10 y Typed-Decisions 10/10. Son diez ejemplos exploratorios. [Comparación y límites](COMPARACION.md).
+
+La [prueba inicial ES/PT/EN](RESULTADOS.md) se conserva: Multilingual obtuvo 18/30 clasificaciones correctas. Sus archivos y hashes corresponden al [commit inicial](https://github.com/torresnicolas0/laya-local-lab/tree/22024e4d79e730e27c3658e065f71d7fb734cbb8).
 
 ## Reproducir
 
@@ -19,7 +21,7 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   .venv/bin/python lab.py evaluate --device cpu --output results/my-cpu.json
 ```
 
-`uv.lock` fija las dependencias y `model.lock.json` la revisión exacta del modelo. El programa descarga únicamente el checkpoint multilingüe. Rechaza entradas que exceden el contexto y se niega a sobrescribir resultados existentes.
+`uv.lock` fija las dependencias y `models.lock.json` las revisiones de los tres modelos. Sin opciones, se descarga y evalúa únicamente Multilingual; `model.lock.json` conserva el registro original. El programa rechaza entradas demasiado largas y no sobrescribe resultados existentes.
 
 En un Mac compatible, repetir **después de terminar CPU**:
 
@@ -30,6 +32,18 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
 
 Si MPS no está disponible, usar CPU. En esta prueba Codex necesitó permiso para acceder a la GPU y abrir el puerto local; eso corresponde al aislamiento de la herramienta.
 
+## Comparar las tres variantes
+
+```sh
+.venv/bin/python lab.py prepare --model all
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+  .venv/bin/python lab.py compare --device cpu --output-dir results/my-comparison-cpu
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+  .venv/bin/python lab.py compare --device mps --output-dir results/my-comparison-mps
+```
+
+Los modelos corren secuencialmente en procesos separados, sobre los mismos diez textos ingleses. Se guardan respuestas individuales y `summary.json`. La descarga adicional es de unos 840 MB por cada variante inglesa. Para evaluar una sola: `evaluate --model typed-decisions --language en --device cpu --output results/my-typed.json` después de `lab.py`.
+
 ## Probar en el navegador
 
 ```sh
@@ -37,9 +51,9 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   .venv/bin/python -m streamlit run app.py
 ```
 
-Abrir [127.0.0.1:8501](http://127.0.0.1:8501). Elegir un ejemplo, editarlo y pulsar **Analizar**. La interfaz usa CPU, muestra las respuestas originales y permite descargarlas. Los cambios interactivos no modifican el conjunto de evaluación. Escucha solo en localhost y tiene la telemetría de Streamlit desactivada.
+Abrir [127.0.0.1:8501](http://127.0.0.1:8501). Elegir modelo y ejemplo, editarlo y pulsar **Analizar**. La interfaz usa CPU y permite descargar las respuestas originales. Base y Typed-Decisions ofrecen ejemplos ingleses. Los cambios interactivos no modifican la evaluación. Escucha solo en localhost y tiene la telemetría desactivada.
 
-![Demostración local](docs/demo.png)
+![Selector de variantes](docs/comparison.png)
 
 ## Comprobaciones
 
@@ -56,7 +70,7 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   --output results/my-offline.json
 ```
 
-Los cuatro tests comprueban entradas, límites, contrato real del modelo y cálculos con valores conocidos. No exigen que el modelo acierte: eso se mide por separado.
+Para repetir las tres variantes sin red, sustituir `evaluate ...` por `compare --device cpu --verify-offline --output-dir results/my-comparison-offline` en el comando anterior. Los seis tests comprueban entradas, límites, contrato real, cálculos, selección de idioma y revisión de modelos; la precisión se mide por separado.
 
 ## Qué contiene
 
@@ -64,6 +78,6 @@ Los cuatro tests comprueban entradas, límites, contrato real del modelo y cálc
 - `questions.json`: preguntas y rúbrica fijas, en inglés.
 - `lab.py`: descarga y evaluación; `app.py`: demostración mínima.
 - `results/`: respuestas originales, métricas, entorno, hashes y verificación.
-- `RESULTADOS.md`: método, cifras y errores relevantes para contar la experiencia.
+- `RESULTADOS.md`: prueba inicial; `COMPARACION.md`: ampliación con las tres variantes.
 
 El modelo y el SDK son proyectos de ConvAI, con licencia Apache-2.0. Este repositorio no incluye sus pesos. No se utilizaron correos, clientes ni datos privados.

@@ -9,6 +9,7 @@ import os
 import platform
 import resource
 import socket
+import subprocess
 import sys
 import time
 from collections import Counter
@@ -16,6 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+MODEL_NAMES = ("multilingual", "english", "typed-decisions")
 os.environ.setdefault("HF_HOME", str(ROOT / ".cache/huggingface"))
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
@@ -38,24 +40,25 @@ def save_json(path, value):
         handle.write("\n")
 
 
-def model_path(download=False):
+def model_path(download=False, model="multilingual"):
     from huggingface_hub import snapshot_download
-    lock = read_json("model.lock.json")
+    lock = read_json("models.lock.json")[model]
+    prefix = lock["subfolder"] + "/" if lock["subfolder"] else ""
     path = snapshot_download(
         lock["repository"], revision=lock["revision"],
-        allow_patterns=[lock["subfolder"] + "/*"],
+        allow_patterns=[prefix + name for name in ["rl_agent_config.json", "model.safetensors", "tokenizer/*", "encoder/*"]],
         local_files_only=not download, token=False,
     )
     return Path(path) / lock["subfolder"]
 
 
-def load_agent(device="cpu"):
+def load_agent(device="cpu", model="multilingual"):
     import laya
     import torch
     torch.set_num_threads(4)
     if device == "mps" and not torch.backends.mps.is_available():
         raise RuntimeError("MPS is unavailable; run --device cpu instead.")
-    agent = laya.load(str(model_path()), device=device)
+    agent = laya.load(str(model_path(model=model)), device=device)
     if str(agent.device) != device:
         raise RuntimeError(f"Requested {device}, but Laya selected {agent.device}.")
     return agent
@@ -102,11 +105,12 @@ def predict(agent, state, questions):
     return result, (time.perf_counter() - started) * 1000
 
 
-def cases():
+def cases(language="all"):
     return [
         {"id": f"{case['id']}_{lang}", "scenario": case["id"], "language": lang,
          "tags": case["tags"], "state": {"body": text}, "expected": case["expected"]}
         for case in read_json("cases.json") for lang, text in case["texts"].items()
+        if language == "all" or lang == language
     ]
 
 
@@ -145,12 +149,14 @@ def verify_network_denied():
     return "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
 
 
-def evaluate(device, output, offline=False):
+def evaluate(device, output, offline=False, model="multilingual", language="all"):
+    if model != "multilingual" and language != "en":
+        raise ValueError("English-only models require --language en for this evaluation.")
     if Path(output).exists():
         raise FileExistsError(f"Refusing to overwrite results: {output}")
     network_proof = verify_network_denied() if offline else None
     started = time.perf_counter()
-    agent = load_agent(device)
+    agent = load_agent(device, model)
     load_seconds = time.perf_counter() - started
     questions = read_json("questions.json")
     warmup_ms = []
@@ -158,7 +164,7 @@ def evaluate(device, output, offline=False):
         _, latency = predict(agent, {"body": "Please send information about your product."}, questions)
         warmup_ms.append(latency)
     rows = []
-    for case in cases():
+    for case in cases(language):
         result, latency = predict(agent, case["state"], questions)
         if str(agent.device) != device:
             raise RuntimeError("The model changed device during evaluation.")
@@ -166,7 +172,8 @@ def evaluate(device, output, offline=False):
         print(f"{case['id']}: {result['answers']['department']['choice']} ({latency:.1f} ms)", flush=True)
     report = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "protocol": {"scenarios": 10, "translated_inputs": 30, "questions_per_request": 3,
+        "protocol": {"scenarios": 10, "translated_inputs": len(rows), "questions_per_request": 3,
+                     "model_key": model, "language_filter": language,
                      "warmup_requests": 3, "repeats_per_input": 1, "torch_threads": 4,
                      "question_language": "en", "device_requested": device, "device_actual": str(agent.device),
                      "network_denial_proof": network_proof,
@@ -174,31 +181,76 @@ def evaluate(device, output, offline=False):
         "environment": {"python": platform.python_version(), "os": platform.platform(),
                         "machine": platform.machine(),
                         "packages": {p: importlib.metadata.version(p) for p in ["laya", "torch", "transformers", "huggingface-hub", "numpy", "streamlit"]}},
-        "model": read_json("model.lock.json"),
-        "hashes": {p: sha256(p) for p in ["cases.json", "questions.json", "model.lock.json", "uv.lock", "lab.py"]},
+        "model": read_json("models.lock.json")[model],
+        "hashes": {p: sha256(p) for p in ["cases.json", "questions.json", "models.lock.json", "uv.lock", "lab.py"]},
+        "context_tokens": agent.cfg.get("max_len", 512),
         "load_seconds_including_imports": load_seconds, "warmup_ms": warmup_ms,
         "process_peak_rss_mib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1048576 if sys.platform == "darwin" else 1024),
         "overall": metrics(rows),
-        "by_language": {lang: metrics([r for r in rows if r["language"] == lang]) for lang in ["es", "pt", "en"]},
+        "by_language": {lang: metrics([r for r in rows if r["language"] == lang]) for lang in sorted({r["language"] for r in rows})},
         "rows": rows,
     }
     save_json(output, report)
     print(json.dumps(report["overall"], indent=2), flush=True)
 
 
+def compare(device, output_dir, offline=False):
+    """Each model gets its own process, so peak RSS is comparable."""
+    output_dir = Path(output_dir)
+    outputs = [output_dir / (name + ".json") for name in MODEL_NAMES]
+    if any(path.exists() for path in outputs + [output_dir / "summary.json"]):
+        raise FileExistsError("Use a new output directory; comparison results are never overwritten.")
+    reports = []
+    for name, path in zip(MODEL_NAMES, outputs):
+        command = [sys.executable, str(ROOT / "lab.py"), "evaluate", "--device", device,
+                   "--model", name, "--language", "en", "--output", str(path)]
+        if offline:
+            command.append("--verify-offline")
+        subprocess.run(command, check=True)
+        reports.append(json.loads(path.read_text()))
+    reference = [(r["id"], r["state"], r["expected"]) for r in reports[0]["rows"]]
+    for report in reports[1:]:
+        if reference != [(r["id"], r["state"], r["expected"]) for r in report["rows"]]:
+            raise RuntimeError("Comparisons must use identical cases and labels.")
+        if report["hashes"] != reports[0]["hashes"]:
+            raise RuntimeError("Inputs or code changed during comparison.")
+    summary = {
+        "device": device, "language": "en", "inputs_per_model": 10,
+        "separate_sequential_processes": True,
+        "model_order": list(MODEL_NAMES),
+        "memory_scope": "Peak process RSS, not total unified/GPU memory",
+        "models": {name: {**report["overall"],
+                          "load_seconds": report["load_seconds_including_imports"],
+                          "process_peak_rss_mib": report["process_peak_rss_mib"]}
+                   for name, report in zip(MODEL_NAMES, reports)},
+    }
+    save_json(output_dir / "summary.json", summary)
+    print(json.dumps(summary, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("prepare", help="Download only the pinned multilingual checkpoint")
+    prepare = sub.add_parser("prepare", help="Download pinned checkpoints")
+    prepare.add_argument("--model", choices=[*MODEL_NAMES, "all"], default="multilingual")
     run = sub.add_parser("evaluate", help="Run the fixed 30-input evaluation")
     run.add_argument("--device", choices=["cpu", "mps"], default="cpu")
     run.add_argument("--output", required=True)
     run.add_argument("--verify-offline", action="store_true")
+    run.add_argument("--model", choices=MODEL_NAMES, default="multilingual")
+    run.add_argument("--language", choices=["all", "en", "es", "pt"], default="all")
+    comparison = sub.add_parser("compare", help="Compare all three models on the same ten English inputs")
+    comparison.add_argument("--device", choices=["cpu", "mps"], default="cpu")
+    comparison.add_argument("--output-dir", required=True)
+    comparison.add_argument("--verify-offline", action="store_true")
     args = parser.parse_args()
     if args.command == "prepare":
-        print(model_path(download=True))
+        for name in MODEL_NAMES if args.model == "all" else [args.model]:
+            print(model_path(download=True, model=name))
+    elif args.command == "compare":
+        compare(args.device, args.output_dir, args.verify_offline)
     else:
-        evaluate(args.device, args.output, args.verify_offline)
+        evaluate(args.device, args.output, args.verify_offline, args.model, args.language)
 
 
 if __name__ == "__main__":

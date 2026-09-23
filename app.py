@@ -4,21 +4,31 @@ import threading
 
 import streamlit as st
 
-from lab import cases, load_agent, predict, read_json
+from lab import MODEL_NAMES, ROOT, cases, load_agent, predict, read_json
 
 st.set_page_config(page_title="Laya · prueba local", page_icon="🧪", layout="wide")
 
 
 @st.cache_resource(max_entries=1)
-def engine():
-    return load_agent("cpu"), threading.Lock()
+def engine(model):
+    return load_agent("cpu", model), threading.Lock()
+
+
+def clear_result():
+    st.session_state.pop("last_result", None)
 
 
 st.title("Laya · prueba local")
-st.caption("Modelo multilingüe · Inferencia local · Clasificación, urgencia y devoluciones")
-examples = cases()
-selection = st.selectbox("Ejemplo", range(len(examples)), format_func=lambda i: examples[i]["id"])
-text = st.text_area("Solicitud", value=examples[selection]["state"]["body"], height=130, key=f"input_{selection}")
+st.caption("Tres variantes · Inferencia local · Clasificación, urgencia y devoluciones")
+model_labels = {"multilingual": "Laya Multilingual · ES/PT/EN", "english": "Laya base · inglés", "typed-decisions": "Laya Typed-Decisions · inglés"}
+model = st.selectbox("Modelo", MODEL_NAMES, format_func=model_labels.get, on_change=clear_result)
+if st.session_state.get("last_result", {}).get("model") != model:
+    clear_result()
+if model != "multilingual":
+    st.caption("Esta variante está orientada a inglés. La comparación usa los mismos diez ejemplos ingleses.")
+examples = cases("all" if model == "multilingual" else "en")
+selection = st.selectbox("Ejemplo", range(len(examples)), format_func=lambda i: examples[i]["id"], key=f"example_{model}", on_change=clear_result)
+text = st.text_area("Solicitud", value=examples[selection]["state"]["body"], height=130, key=f"input_{model}_{selection}")
 with st.expander("Preguntas del experimento"):
     question_text = st.text_area("Preguntas JSON", json.dumps(read_json("questions.json"), ensure_ascii=False, indent=2), height=300)
 if st.button("Analizar", type="primary"):
@@ -32,10 +42,10 @@ if st.button("Analizar", type="primary"):
             if not isinstance(questions[key], dict) or questions[key].get("type") != expected_type:
                 raise ValueError(f"La pregunta {key} debe usar el tipo {expected_type}.")
         with st.spinner("Cargando el modelo local y analizando…"):
-            agent, lock = engine()
+            agent, lock = engine(model)
             with lock:
                 result, latency = predict(agent, {"body": text}, questions)
-        st.session_state["last_result"] = {"input": text, "questions": questions, "result": result, "latency_ms": latency}
+        st.session_state["last_result"] = {"model": model, "model_lock": read_json("models.lock.json")[model], "input": text, "questions": questions, "result": result, "latency_ms": latency}
     except (ValueError, RuntimeError, OSError, KeyError) as error:
         st.session_state.pop("last_result", None)
         st.error(str(error))
@@ -49,7 +59,7 @@ if "last_result" in st.session_state:
     cols[0].metric("Departamento", labels.get(answers["department"]["choice"], answers["department"]["choice"]))
     cols[1].metric("Urgencia (0–2)", f"{answers['urgency']['score']:.2f}")
     cols[2].metric("Probabilidad de devolución", f"{100 * answers['refund_requested']['noul']:.1f} %")
-    st.caption(f"CPU · {saved['latency_ms']:.1f} ms para las tres preguntas · carga inicial excluida")
+    st.caption(f"{model_labels[saved['model']]} · CPU · {saved['latency_ms']:.1f} ms para las tres preguntas · carga inicial excluida")
     probabilities = answers["department"]["probabilities"]
     st.bar_chart({"Departamento": [labels.get(k, k) for k in probabilities], "Probabilidad": list(probabilities.values())}, x="Departamento", y="Probabilidad", horizontal=True)
     st.info("Las probabilidades son estimaciones del modelo. Contrastalas con los resultados del experimento; no garantizan acierto.")
@@ -57,4 +67,9 @@ if "last_result" in st.session_state:
         st.json(saved["result"])
     st.download_button("Descargar resultado JSON", json.dumps(saved, ensure_ascii=False, indent=2), "laya-result.json", "application/json")
 
-st.caption("Laya 0.3.11 · checkpoint " + read_json("model.lock.json")["revision"][:12] + " · 10 situaciones / 30 traducciones de prueba")
+summary_path = ROOT / "results/comparison-cpu/summary.json"
+if summary_path.exists():
+    with st.expander("Comparativa medida · los mismos diez ejemplos ingleses · CPU"):
+        summary = json.loads(summary_path.read_text())
+        st.table([{"Modelo": name, "Departamento": f"{m['department_correct']}/10", "Devolución": f"{m['refund_accuracy_threshold_0_5']:.0%}", "Urgencia MAE": round(m['urgency_mae_0_to_2'], 3), "Mediana ms": round(m['latency_p50_ms'], 1)} for name, m in summary["models"].items()])
+st.caption("Laya 0.3.11 · checkpoint " + read_json("models.lock.json")[model]["revision"][:12] + " · resultados exploratorios, sin entrenamiento adicional")

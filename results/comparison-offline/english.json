@@ -1,0 +1,745 @@
+{
+  "timestamp_utc": "2026-09-23T19:36:27.205141+00:00",
+  "protocol": {
+    "scenarios": 10,
+    "translated_inputs": 10,
+    "questions_per_request": 3,
+    "model_key": "english",
+    "language_filter": "en",
+    "warmup_requests": 3,
+    "repeats_per_input": 1,
+    "torch_threads": 4,
+    "question_language": "en",
+    "device_requested": "cpu",
+    "device_actual": "cpu",
+    "network_denial_proof": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES",
+    "timing_scope": "SDK predict for all three questions; prevalidation excluded; MPS synchronized"
+  },
+  "environment": {
+    "python": "3.12.8",
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "packages": {
+      "laya": "0.3.11",
+      "torch": "2.14.0",
+      "transformers": "5.17.0",
+      "huggingface-hub": "1.32.0",
+      "numpy": "2.5.3",
+      "streamlit": "1.64.0"
+    }
+  },
+  "model": {
+    "repository": "convaiinnovations/laya",
+    "revision": "aa8c91ca088ec597df95a0d1c76b3063cb2ae5e8",
+    "subfolder": ""
+  },
+  "hashes": {
+    "cases.json": "736213409cd52590284dd2e448f77000869775a95f22b5f092b73ed0cc951232",
+    "questions.json": "eee478d9a26bfcf7def31f4c1654b816e23dd15440504cb023b06316a57af0c0",
+    "models.lock.json": "11afabe7f675065c8d68d07687cfe695884f5963e8bbdfc8de79a296b247c99c",
+    "uv.lock": "683894c5c864e01d57bcb5ddf18d2ca3cfe624060f2f2c8ccdccb77045286b9c",
+    "lab.py": "053ed31358a0164fab5477b30efa848e39f62a17049a4f8cd12e13f787dc7524"
+  },
+  "context_tokens": 512,
+  "load_seconds_including_imports": 2.784162541036494,
+  "warmup_ms": [
+    313.50583292078227,
+    229.77791703306139,
+    228.44820900354534
+  ],
+  "process_peak_rss_mib": 2832.890625,
+  "overall": {
+    "n": 10,
+    "department_correct": 9,
+    "department_accuracy": 0.9,
+    "majority_department_baseline": 0.3,
+    "urgency_mae_0_to_2": 0.13088000000000002,
+    "refund_accuracy_threshold_0_5": 0.9,
+    "refund_always_no_baseline": 0.8,
+    "refund_brier": 0.058794526,
+    "latency_p50_ms": 271.99702156940475,
+    "latency_p95_ms": 285.802831267938
+  },
+  "by_language": {
+    "en": {
+      "n": 10,
+      "department_correct": 9,
+      "department_accuracy": 0.9,
+      "majority_department_baseline": 0.3,
+      "urgency_mae_0_to_2": 0.13088000000000002,
+      "refund_accuracy_threshold_0_5": 0.9,
+      "refund_always_no_baseline": 0.8,
+      "refund_brier": 0.058794526,
+      "latency_p50_ms": 271.99702156940475,
+      "latency_p95_ms": 285.802831267938
+    }
+  },
+  "rows": [
+    {
+      "id": "01_duplicate_charge_en",
+      "scenario": "01_duplicate_charge",
+      "language": "en",
+      "tags": [
+        "explicit_refund"
+      ],
+      "state": {
+        "body": "My statement shows two charges for the same subscription. Please refund the duplicate charge. There is no rush."
+      },
+      "expected": {
+        "department": "billing",
+        "urgency": 0,
+        "refund_requested": true
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "probabilities": {
+              "billing": 0.9049,
+              "technical": 0.0237,
+              "sales": 0.0335,
+              "other": 0.0379
+            },
+            "confidence": 0.6993,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.2054,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.805,
+              "1": 0.1846,
+              "2": 0.0104
+            },
+            "confidence": 0.5139,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.8446,
+            "confidence": 0.8446,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 226,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 241.7159581091255
+    },
+    {
+      "id": "02_checkout_outage_en",
+      "scenario": "02_checkout_outage",
+      "language": "en",
+      "tags": [
+        "service_blocked"
+      ],
+      "state": {
+        "body": "The pay button returns a 500 error for every customer. No purchase can be completed and we are losing orders right now."
+      },
+      "expected": {
+        "department": "technical",
+        "urgency": 2,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "technical",
+            "probabilities": {
+              "billing": 0.3639,
+              "technical": 0.5285,
+              "sales": 0.0579,
+              "other": 0.0497
+            },
+            "confidence": 0.2649,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 1.9785,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.0033,
+              "1": 0.0149,
+              "2": 0.9818
+            },
+            "confidence": 0.9093,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.5885,
+            "confidence": 0.5885,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 235,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 248.35504195652902
+    },
+    {
+      "id": "03_pricing_en",
+      "scenario": "03_pricing",
+      "language": "en",
+      "tags": [
+        "sales"
+      ],
+      "state": {
+        "body": "We are comparing vendors for next year. How much does the ten-user plan cost and what does it include? We have no deadline."
+      },
+      "expected": {
+        "department": "sales",
+        "urgency": 0,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "sales",
+            "probabilities": {
+              "billing": 0.1081,
+              "technical": 0.0633,
+              "sales": 0.6628,
+              "other": 0.1658
+            },
+            "confidence": 0.289,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.2658,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.7724,
+              "1": 0.1894,
+              "2": 0.0382
+            },
+            "confidence": 0.418,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.0002,
+            "confidence": 0.9998,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 247,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 279.2397500015795
+    },
+    {
+      "id": "04_negated_refund_en",
+      "scenario": "04_negated_refund",
+      "language": "en",
+      "tags": [
+        "negation"
+      ],
+      "state": {
+        "body": "I do not want a refund or to cancel anything. I only need a copy of the August invoice for my records whenever you can."
+      },
+      "expected": {
+        "department": "billing",
+        "urgency": 0,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "probabilities": {
+              "billing": 0.9184,
+              "technical": 0.0181,
+              "sales": 0.0205,
+              "other": 0.043
+            },
+            "confidence": 0.7362,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.0603,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.9461,
+              "1": 0.0474,
+              "2": 0.0065
+            },
+            "confidence": 0.7911,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.2993,
+            "confidence": 0.7007,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 244,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 274.6533340541646
+    },
+    {
+      "id": "05_slow_export_en",
+      "scenario": "05_slow_export",
+      "language": "en",
+      "tags": [
+        "workaround",
+        "deadline"
+      ],
+      "state": {
+        "body": "The report export is taking too long. We can keep working with the manual download, but need this fixed before tomorrow's meeting."
+      },
+      "expected": {
+        "department": "technical",
+        "urgency": 1,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "technical",
+            "probabilities": {
+              "billing": 0.0467,
+              "technical": 0.6165,
+              "sales": 0.0568,
+              "other": 0.28
+            },
+            "confidence": 0.3071,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.9917,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.1691,
+              "1": 0.67,
+              "2": 0.1608
+            },
+            "confidence": 0.2147,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.0321,
+            "confidence": 0.9679,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 241,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 261.7896249284968
+    },
+    {
+      "id": "06_refund_deadline_en",
+      "scenario": "06_refund_deadline",
+      "language": "en",
+      "tags": [
+        "explicit_refund",
+        "deadline"
+      ],
+      "state": {
+        "body": "I canceled the renewal but was charged anyway. I request that money back before Friday to close the accounts. The service is still working."
+      },
+      "expected": {
+        "department": "billing",
+        "urgency": 1,
+        "refund_requested": true
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "probabilities": {
+              "billing": 0.9061,
+              "technical": 0.0381,
+              "sales": 0.0248,
+              "other": 0.0309
+            },
+            "confidence": 0.702,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.8308,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.2429,
+              "1": 0.6834,
+              "2": 0.0737
+            },
+            "confidence": 0.2755,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.7208,
+            "confidence": 0.7208,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 244,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 291.17262503132224
+    },
+    {
+      "id": "07_thanks_en",
+      "scenario": "07_thanks",
+      "language": "en",
+      "tags": [
+        "no_request"
+      ],
+      "state": {
+        "body": "Many thanks to the whole team for your help. Everything works well. This message is only to congratulate you and requires no action."
+      },
+      "expected": {
+        "department": "other",
+        "urgency": 0,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "other",
+            "probabilities": {
+              "billing": 0.1533,
+              "technical": 0.2822,
+              "sales": 0.162,
+              "other": 0.4025
+            },
+            "confidence": 0.0582,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.0667,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.9525,
+              "1": 0.0283,
+              "2": 0.0192
+            },
+            "confidence": 0.797,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.0281,
+            "confidence": 0.9719,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 244,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 275.9630410000682
+    },
+    {
+      "id": "08_privacy_request_en",
+      "scenario": "08_privacy_request",
+      "language": "en",
+      "tags": [
+        "outside_departments",
+        "deadline"
+      ],
+      "state": {
+        "body": "Please forward this message to the person responsible for privacy. I want to correct my address in your records this week. I can keep using the account."
+      },
+      "expected": {
+        "department": "other",
+        "urgency": 1,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "other",
+            "probabilities": {
+              "billing": 0.2247,
+              "technical": 0.282,
+              "sales": 0.156,
+              "other": 0.3373
+            },
+            "confidence": 0.027,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 0.6425,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.3886,
+              "1": 0.5803,
+              "2": 0.0311
+            },
+            "confidence": 0.2799,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.2104,
+            "confidence": 0.7896,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 253,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 266.8330839369446
+    },
+    {
+      "id": "09_login_typos_en",
+      "scenario": "09_login_typos",
+      "language": "en",
+      "tags": [
+        "typos",
+        "blocked"
+      ],
+      "state": {
+        "body": "cant loggin, it always gives an eror. i have no other way in and am completely blocked from working right now."
+      },
+      "expected": {
+        "department": "technical",
+        "urgency": 2,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "technical",
+            "probabilities": {
+              "billing": 0.0086,
+              "technical": 0.9708,
+              "sales": 0.0085,
+              "other": 0.0122
+            },
+            "confidence": 0.8819,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 1.9037,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.0294,
+              "1": 0.0375,
+              "2": 0.9331
+            },
+            "confidence": 0.7346,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.0299,
+            "confidence": 0.9701,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 244,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 278.73304206877947
+    },
+    {
+      "id": "10_mixed_context_en",
+      "scenario": "10_mixed_context",
+      "language": "en",
+      "tags": [
+        "mixed_context",
+        "resolved_issue",
+        "deadline"
+      ],
+      "state": {
+        "body": "The previous invoice problem is already resolved. We now want to buy twenty new licenses. I need a sales proposal by tomorrow; meanwhile we are continuing to work."
+      },
+      "expected": {
+        "department": "sales",
+        "urgency": 1,
+        "refund_requested": false
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "probabilities": {
+              "billing": 0.5733,
+              "technical": 0.077,
+              "sales": 0.2857,
+              "other": 0.0641
+            },
+            "confidence": 0.2424,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "urgency": {
+            "type": "score",
+            "score": 1.0578,
+            "legend": {
+              "0": "Routine request; no deadline or blocked activity",
+              "1": "Time-sensitive request, but activity can continue",
+              "2": "Service is unusable or a critical activity is blocked right now"
+            },
+            "probabilities": {
+              "0": 0.0642,
+              "1": 0.8138,
+              "2": 0.122
+            },
+            "confidence": 0.4534,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.0543,
+            "confidence": 0.9457,
+            "action": {
+              "act_probability": 1.0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 259,
+          "output_tokens": 0
+        }
+      },
+      "latency_ms": 269.3407090846449
+    }
+  ]
+}
