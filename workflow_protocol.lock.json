@@ -1,0 +1,31 @@
+{
+  "frozen_at_utc": "2026-09-23T20:17:43.289518+00:00",
+  "previous_commit": "a24f0890397402ae0614350f17a7125895dd48ba",
+  "language": "en",
+  "synthetic_cases_per_workflow": 12,
+  "workflows": [
+    "guardrails",
+    "rag",
+    "routing"
+  ],
+  "warmup_per_workflow": 3,
+  "warmup_input": "first case of each workflow",
+  "repeats_per_input": 1,
+  "torch_threads": 4,
+  "timing_scope": "SDK predict for all questions in that workflow; prevalidation excluded; MPS synchronized",
+  "questions_per_request": {
+    "guardrails": 2,
+    "rag": 3,
+    "routing": 2
+  },
+  "routing_scope": "Agreement with a declared local routing policy; no provider calls or measured downstream quality/cost",
+  "rag_scope": "Provided query/reference/passage triples; no retriever or answer generator",
+  "hashes": {
+    "workflow_cases.json": "0bcd916da5e6859ee17460558c4c2a66e46f88c9e796570343155f01e2dceca9",
+    "workflows.json": "94a5b1721483aaa9ab47d4c656f1c6a0adced9c988e4dffcd1c89b172296eaff",
+    "workflows.py": "75daf4b744791d91ba7dfb6b469c72dd1b0b947b4ea467ce832ddc82c43faf09",
+    "lab.py": "053ed31358a0164fab5477b30efa848e39f62a17049a4f8cd12e13f787dc7524",
+    "models.lock.json": "11afabe7f675065c8d68d07687cfe695884f5963e8bbdfc8de79a296b247c99c",
+    "uv.lock": "683894c5c864e01d57bcb5ddf18d2ca3cfe624060f2f2c8ccdccb77045286b9c"
+  }
+}

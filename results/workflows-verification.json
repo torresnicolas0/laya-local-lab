@@ -1,0 +1,61 @@
+{
+  "protocol_frozen_at_utc": "2026-09-23T20:17:43.289518+00:00",
+  "models": {
+    "multilingual": {
+      "full_cpu_offline_responses_identical": 36,
+      "cpu_mps_actions_identical": 36,
+      "metrics_recomputed": true,
+      "same_cases_labels_and_protocol": true,
+      "offline_network_denial": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    },
+    "english": {
+      "full_cpu_offline_responses_identical": 36,
+      "cpu_mps_actions_identical": 36,
+      "metrics_recomputed": true,
+      "same_cases_labels_and_protocol": true,
+      "offline_network_denial": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    },
+    "typed-decisions": {
+      "full_cpu_offline_responses_identical": 36,
+      "cpu_mps_actions_identical": 36,
+      "metrics_recomputed": true,
+      "same_cases_labels_and_protocol": true,
+      "offline_network_denial": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES"
+    }
+  },
+  "previous_commit": "a24f0890397402ae0614350f17a7125895dd48ba",
+  "earlier_files_unchanged": [
+    ".gitignore",
+    ".python-version",
+    ".streamlit/config.toml",
+    "COMPARACION.md",
+    "RESULTADOS.md",
+    "cases.json",
+    "docs/comparison.png",
+    "docs/demo.png",
+    "lab.py",
+    "model.lock.json",
+    "models.lock.json",
+    "pyproject.toml",
+    "questions.json",
+    "results/comparison-cpu/english.json",
+    "results/comparison-cpu/multilingual.json",
+    "results/comparison-cpu/summary.json",
+    "results/comparison-cpu/typed-decisions.json",
+    "results/comparison-mps/english.json",
+    "results/comparison-mps/multilingual.json",
+    "results/comparison-mps/summary.json",
+    "results/comparison-mps/typed-decisions.json",
+    "results/comparison-offline/english.json",
+    "results/comparison-offline/multilingual.json",
+    "results/comparison-offline/summary.json",
+    "results/comparison-offline/typed-decisions.json",
+    "results/comparison-verification.json",
+    "results/cpu-repro-offline.json",
+    "results/cpu.json",
+    "results/mps.json",
+    "results/verification.json",
+    "test_lab.py",
+    "uv.lock"
+  ]
+}

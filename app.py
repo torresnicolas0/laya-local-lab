@@ -5,6 +5,7 @@ import threading
 import streamlit as st
 
 from lab import MODEL_NAMES, ROOT, cases, load_agent, predict, read_json
+from workflow_ui import FLOW_LABELS, clear_workflow_result, render_workflow
 
 st.set_page_config(page_title="Laya · prueba local", page_icon="🧪", layout="wide")
 
@@ -16,12 +17,17 @@ def engine(model):
 
 def clear_result():
     st.session_state.pop("last_result", None)
+    clear_workflow_result()
 
 
 st.title("Laya · prueba local")
-st.caption("Tres variantes · Inferencia local · Clasificación, urgencia y devoluciones")
+st.caption("Tres variantes · Inferencia local · Soporte, guardrails, RAG y selección de modelo")
 model_labels = {"multilingual": "Laya Multilingual · ES/PT/EN", "english": "Laya base · inglés", "typed-decisions": "Laya Typed-Decisions · inglés"}
 model = st.selectbox("Modelo", MODEL_NAMES, format_func=model_labels.get, on_change=clear_result)
+flow = st.selectbox("Experimento", list(FLOW_LABELS), format_func=FLOW_LABELS.get, on_change=clear_result)
+if flow != "support":
+    render_workflow(flow, model, model_labels[model], engine)
+    st.stop()
 if st.session_state.get("last_result", {}).get("model") != model:
     clear_result()
 if model != "multilingual":

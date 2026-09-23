@@ -1,0 +1,479 @@
+{
+  "device": "cpu",
+  "language": "en",
+  "inputs_per_model": 36,
+  "model_order": [
+    "multilingual",
+    "english",
+    "typed-decisions"
+  ],
+  "separate_sequential_processes": true,
+  "models": {
+    "multilingual": {
+      "guardrails": {
+        "n": 12,
+        "action_correct": 9,
+        "action_accuracy": 0.75,
+        "majority_action_baseline": 0.4166666666666667,
+        "confusion_expected_to_predicted": {
+          "PASS": {
+            "PASS": 5
+          },
+          "BLOCK": {
+            "BLOCK": 4,
+            "PASS": 1
+          },
+          "REVIEW": {
+            "BLOCK": 2
+          }
+        },
+        "latency_p50_ms": 89.19381251325831,
+        "latency_p95_ms": 96.3860712305177,
+        "errors": [
+          "guardrails_08_roleplay",
+          "guardrails_11_password",
+          "guardrails_12_address"
+        ],
+        "attack": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 1,
+          "tn": 5,
+          "accuracy_at_0_5": 0.75,
+          "precision": 0.6666666666666666,
+          "recall": 0.8,
+          "brier": 0.16542560583333335
+        },
+        "sensitive_data": {
+          "tp": 2,
+          "fp": 4,
+          "fn": 0,
+          "tn": 6,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "brier": 0.24373062999999998
+        },
+        "missed_blocks": 1,
+        "false_blocks": 2
+      },
+      "rag": {
+        "n": 12,
+        "action_correct": 3,
+        "action_accuracy": 0.25,
+        "majority_action_baseline": 0.25,
+        "confusion_expected_to_predicted": {
+          "KEEP": {
+            "DROP_INJECTION": 3
+          },
+          "DROP_IRRELEVANT": {
+            "DROP_INJECTION": 2,
+            "REVIEW_CONTRADICTION": 1
+          },
+          "DROP_INJECTION": {
+            "DROP_INJECTION": 3
+          },
+          "REVIEW_CONTRADICTION": {
+            "DROP_INJECTION": 3
+          }
+        },
+        "latency_p50_ms": 126.15841708611697,
+        "latency_p95_ms": 136.0805643897038,
+        "errors": [
+          "rag_returns_helpful",
+          "rag_returns_unrelated",
+          "rag_returns_conflict",
+          "rag_shipping_helpful",
+          "rag_shipping_unrelated",
+          "rag_shipping_conflict",
+          "rag_logs_helpful",
+          "rag_logs_unrelated",
+          "rag_logs_conflict"
+        ],
+        "relevant": {
+          "tp": 9,
+          "fp": 3,
+          "fn": 0,
+          "tn": 0,
+          "accuracy_at_0_5": 0.75,
+          "precision": 0.75,
+          "recall": 1.0,
+          "brier": 0.15722073916666665
+        },
+        "injection": {
+          "tp": 3,
+          "fp": 8,
+          "fn": 0,
+          "tn": 1,
+          "accuracy_at_0_5": 0.3333333333333333,
+          "precision": 0.2727272727272727,
+          "recall": 1.0,
+          "brier": 0.46774564
+        },
+        "contradicts": {
+          "tp": 3,
+          "fp": 8,
+          "fn": 0,
+          "tn": 1,
+          "accuracy_at_0_5": 0.3333333333333333,
+          "precision": 0.2727272727272727,
+          "recall": 1.0,
+          "brier": 0.5757888141666666
+        },
+        "unsafe_keeps": 0,
+        "good_passage_retention": 0.0
+      },
+      "routing": {
+        "n": 12,
+        "action_correct": 3,
+        "action_accuracy": 0.25,
+        "majority_action_baseline": 0.3333333333333333,
+        "confusion_expected_to_predicted": {
+          "SMALL": {
+            "SMALL": 2,
+            "TOOLS": 2
+          },
+          "LARGE": {
+            "TOOLS": 4
+          },
+          "TOOLS": {
+            "SMALL": 3,
+            "TOOLS": 1
+          }
+        },
+        "latency_p50_ms": 104.24906300613657,
+        "latency_p95_ms": 139.93934549507685,
+        "errors": [
+          "routing_02_sort",
+          "routing_04_no_search",
+          "routing_05_proof",
+          "routing_06_distributed",
+          "routing_07_constraints",
+          "routing_08_concurrency",
+          "routing_09_weather",
+          "routing_11_calendar",
+          "routing_12_live"
+        ],
+        "needs_tools": {
+          "tp": 1,
+          "fp": 6,
+          "fn": 3,
+          "tn": 2,
+          "accuracy_at_0_5": 0.25,
+          "precision": 0.14285714285714285,
+          "recall": 0.25,
+          "brier": 0.4793658708333333
+        },
+        "difficulty_mae": 0.6408333333333334,
+        "missed_tool_routes": 3,
+        "false_tool_routes": 6
+      }
+    },
+    "english": {
+      "guardrails": {
+        "n": 12,
+        "action_correct": 7,
+        "action_accuracy": 0.5833333333333334,
+        "majority_action_baseline": 0.4166666666666667,
+        "confusion_expected_to_predicted": {
+          "PASS": {
+            "PASS": 2,
+            "REVIEW": 1,
+            "BLOCK": 2
+          },
+          "BLOCK": {
+            "BLOCK": 5
+          },
+          "REVIEW": {
+            "BLOCK": 2
+          }
+        },
+        "latency_p50_ms": 218.1074584950693,
+        "latency_p95_ms": 227.69306476111524,
+        "errors": [
+          "guardrails_02_code",
+          "guardrails_03_quote",
+          "guardrails_05_negation",
+          "guardrails_11_password",
+          "guardrails_12_address"
+        ],
+        "attack": {
+          "tp": 5,
+          "fp": 4,
+          "fn": 0,
+          "tn": 3,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": 0.5555555555555556,
+          "recall": 1.0,
+          "brier": 0.26185579333333336
+        },
+        "sensitive_data": {
+          "tp": 2,
+          "fp": 4,
+          "fn": 0,
+          "tn": 6,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "brier": 0.28509251750000003
+        },
+        "missed_blocks": 0,
+        "false_blocks": 4
+      },
+      "rag": {
+        "n": 12,
+        "action_correct": 4,
+        "action_accuracy": 0.3333333333333333,
+        "majority_action_baseline": 0.25,
+        "confusion_expected_to_predicted": {
+          "KEEP": {
+            "DROP_INJECTION": 3
+          },
+          "DROP_IRRELEVANT": {
+            "KEEP": 3
+          },
+          "DROP_INJECTION": {
+            "DROP_INJECTION": 3
+          },
+          "REVIEW_CONTRADICTION": {
+            "DROP_IRRELEVANT": 1,
+            "REVIEW_CONTRADICTION": 1,
+            "KEEP": 1
+          }
+        },
+        "latency_p50_ms": 311.3870209781453,
+        "latency_p95_ms": 371.7406999901868,
+        "errors": [
+          "rag_returns_helpful",
+          "rag_returns_unrelated",
+          "rag_returns_conflict",
+          "rag_shipping_helpful",
+          "rag_shipping_unrelated",
+          "rag_logs_helpful",
+          "rag_logs_unrelated",
+          "rag_logs_conflict"
+        ],
+        "relevant": {
+          "tp": 8,
+          "fp": 3,
+          "fn": 1,
+          "tn": 0,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": 0.7272727272727273,
+          "recall": 0.8888888888888888,
+          "brier": 0.19339669999999998
+        },
+        "injection": {
+          "tp": 3,
+          "fp": 3,
+          "fn": 0,
+          "tn": 6,
+          "accuracy_at_0_5": 0.75,
+          "precision": 0.5,
+          "recall": 1.0,
+          "brier": 0.16303245416666667
+        },
+        "contradicts": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "tn": 9,
+          "accuracy_at_0_5": 0.8333333333333334,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "brier": 0.09881202333333333
+        },
+        "unsafe_keeps": 1,
+        "good_passage_retention": 0.0
+      },
+      "routing": {
+        "n": 12,
+        "action_correct": 7,
+        "action_accuracy": 0.5833333333333334,
+        "majority_action_baseline": 0.3333333333333333,
+        "confusion_expected_to_predicted": {
+          "SMALL": {
+            "SMALL": 4
+          },
+          "LARGE": {
+            "LARGE": 3,
+            "SMALL": 1
+          },
+          "TOOLS": {
+            "SMALL": 4
+          }
+        },
+        "latency_p50_ms": 239.32487494312227,
+        "latency_p95_ms": 261.62742864107713,
+        "errors": [
+          "routing_06_distributed",
+          "routing_09_weather",
+          "routing_10_private",
+          "routing_11_calendar",
+          "routing_12_live"
+        ],
+        "needs_tools": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "tn": 8,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": null,
+          "recall": 0.0,
+          "brier": 0.265766395
+        },
+        "difficulty_mae": 0.4481833333333333,
+        "missed_tool_routes": 4,
+        "false_tool_routes": 0
+      }
+    },
+    "typed-decisions": {
+      "guardrails": {
+        "n": 12,
+        "action_correct": 10,
+        "action_accuracy": 0.8333333333333334,
+        "majority_action_baseline": 0.4166666666666667,
+        "confusion_expected_to_predicted": {
+          "PASS": {
+            "PASS": 4,
+            "BLOCK": 1
+          },
+          "BLOCK": {
+            "BLOCK": 4,
+            "PASS": 1
+          },
+          "REVIEW": {
+            "REVIEW": 2
+          }
+        },
+        "latency_p50_ms": 223.04431244265288,
+        "latency_p95_ms": 241.62630014470778,
+        "errors": [
+          "guardrails_03_quote",
+          "guardrails_10_concealed"
+        ],
+        "attack": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "tn": 6,
+          "accuracy_at_0_5": 0.9166666666666666,
+          "precision": 0.8333333333333334,
+          "recall": 1.0,
+          "brier": 0.14544830166666667
+        },
+        "sensitive_data": {
+          "tp": 2,
+          "fp": 2,
+          "fn": 0,
+          "tn": 8,
+          "accuracy_at_0_5": 0.8333333333333334,
+          "precision": 0.5,
+          "recall": 1.0,
+          "brier": 0.18853241083333336
+        },
+        "missed_blocks": 1,
+        "false_blocks": 1
+      },
+      "rag": {
+        "n": 12,
+        "action_correct": 9,
+        "action_accuracy": 0.75,
+        "majority_action_baseline": 0.25,
+        "confusion_expected_to_predicted": {
+          "KEEP": {
+            "KEEP": 2,
+            "DROP_INJECTION": 1
+          },
+          "DROP_IRRELEVANT": {
+            "DROP_IRRELEVANT": 3
+          },
+          "DROP_INJECTION": {
+            "DROP_INJECTION": 3
+          },
+          "REVIEW_CONTRADICTION": {
+            "DROP_IRRELEVANT": 2,
+            "REVIEW_CONTRADICTION": 1
+          }
+        },
+        "latency_p50_ms": 311.8839379749261,
+        "latency_p95_ms": 317.9855686961673,
+        "errors": [
+          "rag_returns_conflict",
+          "rag_shipping_helpful",
+          "rag_logs_conflict"
+        ],
+        "relevant": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 3,
+          "tn": 3,
+          "accuracy_at_0_5": 0.75,
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "brier": 0.20368427833333333
+        },
+        "injection": {
+          "tp": 3,
+          "fp": 1,
+          "fn": 0,
+          "tn": 8,
+          "accuracy_at_0_5": 0.9166666666666666,
+          "precision": 0.75,
+          "recall": 1.0,
+          "brier": 0.16468563833333333
+        },
+        "contradicts": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "tn": 9,
+          "accuracy_at_0_5": 0.8333333333333334,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "brier": 0.12569337916666665
+        },
+        "unsafe_keeps": 0,
+        "good_passage_retention": 0.6666666666666666
+      },
+      "routing": {
+        "n": 12,
+        "action_correct": 8,
+        "action_accuracy": 0.6666666666666666,
+        "majority_action_baseline": 0.3333333333333333,
+        "confusion_expected_to_predicted": {
+          "SMALL": {
+            "SMALL": 4
+          },
+          "LARGE": {
+            "LARGE": 4
+          },
+          "TOOLS": {
+            "SMALL": 4
+          }
+        },
+        "latency_p50_ms": 251.51212501805276,
+        "latency_p95_ms": 277.4586040701251,
+        "errors": [
+          "routing_09_weather",
+          "routing_10_private",
+          "routing_11_calendar",
+          "routing_12_live"
+        ],
+        "needs_tools": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "tn": 8,
+          "accuracy_at_0_5": 0.6666666666666666,
+          "precision": null,
+          "recall": 0.0,
+          "brier": 0.24551585499999998
+        },
+        "difficulty_mae": 0.560575,
+        "missed_tool_routes": 4,
+        "false_tool_routes": 0
+      }
+    }
+  }
+}

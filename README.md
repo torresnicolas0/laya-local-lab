@@ -1,8 +1,10 @@
 # Laya local lab
 
-Una comparación reproducible de tres variantes de [Laya](https://github.com/NandhaKishorM/laya) en un Mac M1 Max: clasificar solicitudes, puntuar urgencia y detectar peticiones de devolución. Todo el texto es sintético; la inferencia se ejecuta localmente.
+Una prueba reproducible de tres variantes de [Laya](https://github.com/NandhaKishorM/laya) en un Mac M1 Max: soporte, guardrails, filtro RAG y selección de modelo. Todo el texto es sintético; la inferencia se ejecuta localmente.
 
 **Comparación en inglés:** Multilingual acertó 6/10 departamentos, Laya base 9/10 y Typed-Decisions 10/10. Son diez ejemplos exploratorios. [Comparación y límites](COMPARACION.md).
+
+**Tres escenarios nuevos:** Typed-Decisions obtuvo 10/12 en guardrails, 9/12 en RAG y 8/12 en selección, pero falló las cuatro peticiones que necesitaban herramientas. [Método, errores y receta](ESCENARIOS.md). El 10/10 en soporte no se generalizó.
 
 La [prueba inicial ES/PT/EN](RESULTADOS.md) se conserva: Multilingual obtuvo 18/30 clasificaciones correctas. Sus archivos y hashes corresponden al [commit inicial](https://github.com/torresnicolas0/laya-local-lab/tree/22024e4d79e730e27c3658e065f71d7fb734cbb8).
 
@@ -51,13 +53,14 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   .venv/bin/python -m streamlit run app.py
 ```
 
-Abrir [127.0.0.1:8501](http://127.0.0.1:8501). Elegir modelo y ejemplo, editarlo y pulsar **Analizar**. La interfaz usa CPU y permite descargar las respuestas originales. Base y Typed-Decisions ofrecen ejemplos ingleses. Los cambios interactivos no modifican la evaluación. Escucha solo en localhost y tiene la telemetría desactivada.
+Abrir [127.0.0.1:8501](http://127.0.0.1:8501). Elegir modelo, experimento y ejemplo, editarlo y pulsar **Analizar**. La interfaz usa CPU y permite descargar las respuestas originales. Los tres escenarios nuevos usan inglés; la selección de modelo muestra una propuesta sin llamar a proveedores. Los cambios interactivos no modifican la evaluación. Escucha solo en localhost y tiene la telemetría desactivada.
 
 ![Selector de variantes](docs/comparison.png)
 
 ## Comprobaciones
 
 ```sh
+.venv/bin/python lab.py prepare --model all
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 .venv/bin/python -m unittest -v
 
 # Entorno nuevo, reutilizando paquetes y modelo ya descargados:
@@ -70,14 +73,17 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   --output results/my-offline.json
 ```
 
-Para repetir las tres variantes sin red, sustituir `evaluate ...` por `compare --device cpu --verify-offline --output-dir results/my-comparison-offline` en el comando anterior. Los seis tests comprueban entradas, límites, contrato real, cálculos, selección de idioma y revisión de modelos; la precisión se mide por separado.
+Para repetir las tres variantes sin red, sustituir `evaluate ...` por `compare --device cpu --verify-offline --output-dir results/my-comparison-offline` en el comando anterior. Los seis tests originales comprueban entradas, límites, contrato real, cálculos, selección de idioma y revisión de modelos; la precisión se mide por separado.
+
+Para los nuevos escenarios, usar `workflows.py compare --device cpu --verify-offline --output-dir results/my-workflows-offline` dentro del mismo sandbox. Cinco tests añadidos comprueban protocolo, reglas, métricas e interacción real. Pasaron los once tests.
 
 ## Qué contiene
 
 - `cases.json`: diez situaciones traducidas a tres idiomas, con etiquetas esperadas.
 - `questions.json`: preguntas y rúbrica fijas, en inglés.
 - `lab.py`: descarga y evaluación; `app.py`: demostración mínima.
+- `workflows.py`, `workflows.json`, `workflow_cases.json`: tres escenarios con protocolo fijado antes de ejecutar.
 - `results/`: respuestas originales, métricas, entorno, hashes y verificación.
-- `RESULTADOS.md`: prueba inicial; `COMPARACION.md`: ampliación con las tres variantes.
+- `RESULTADOS.md`: prueba inicial; `COMPARACION.md`: variantes en soporte; `ESCENARIOS.md`: usos adicionales y sus límites.
 
 El modelo y el SDK son proyectos de ConvAI, con licencia Apache-2.0. Este repositorio no incluye sus pesos. No se utilizaron correos, clientes ni datos privados.
