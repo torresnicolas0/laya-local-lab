@@ -1,0 +1,92 @@
+[
+  {
+    "id": "01_duplicate_charge", "tags": ["explicit_refund"],
+    "expected": {"department": "billing", "urgency": 0, "refund_requested": true},
+    "texts": {
+      "es": "Mi extracto muestra dos cobros por la misma suscripción. Por favor, reembolsen el cargo duplicado. No hay prisa.",
+      "pt": "Meu extrato mostra duas cobranças pela mesma assinatura. Por favor, reembolsem a cobrança duplicada. Não há pressa.",
+      "en": "My statement shows two charges for the same subscription. Please refund the duplicate charge. There is no rush."
+    }
+  },
+  {
+    "id": "02_checkout_outage", "tags": ["service_blocked"],
+    "expected": {"department": "technical", "urgency": 2, "refund_requested": false},
+    "texts": {
+      "es": "El botón de pagar devuelve un error 500 para todos los clientes. No se puede completar ninguna compra y estamos perdiendo pedidos ahora mismo.",
+      "pt": "O botão de pagar retorna um erro 500 para todos os clientes. Nenhuma compra pode ser concluída e estamos perdendo pedidos agora.",
+      "en": "The pay button returns a 500 error for every customer. No purchase can be completed and we are losing orders right now."
+    }
+  },
+  {
+    "id": "03_pricing", "tags": ["sales"],
+    "expected": {"department": "sales", "urgency": 0, "refund_requested": false},
+    "texts": {
+      "es": "Estamos comparando proveedores para el año que viene. ¿Cuánto cuesta el plan para diez usuarios y qué incluye? No tenemos una fecha límite.",
+      "pt": "Estamos comparando fornecedores para o ano que vem. Quanto custa o plano para dez usuários e o que inclui? Não temos prazo.",
+      "en": "We are comparing vendors for next year. How much does the ten-user plan cost and what does it include? We have no deadline."
+    }
+  },
+  {
+    "id": "04_negated_refund", "tags": ["negation"],
+    "expected": {"department": "billing", "urgency": 0, "refund_requested": false},
+    "texts": {
+      "es": "No quiero una devolución ni cancelar nada. Solo necesito una copia de la factura de agosto para archivarla, cuando puedan.",
+      "pt": "Não quero reembolso nem cancelar nada. Só preciso de uma cópia da fatura de agosto para arquivar, quando puderem.",
+      "en": "I do not want a refund or to cancel anything. I only need a copy of the August invoice for my records whenever you can."
+    }
+  },
+  {
+    "id": "05_slow_export", "tags": ["workaround", "deadline"],
+    "expected": {"department": "technical", "urgency": 1, "refund_requested": false},
+    "texts": {
+      "es": "La exportación del informe tarda demasiado. Podemos seguir trabajando con la descarga manual, pero necesitamos corregirlo antes de la reunión de mañana.",
+      "pt": "A exportação do relatório está demorando demais. Podemos continuar trabalhando com o download manual, mas precisamos corrigir isso antes da reunião de amanhã.",
+      "en": "The report export is taking too long. We can keep working with the manual download, but need this fixed before tomorrow's meeting."
+    }
+  },
+  {
+    "id": "06_refund_deadline", "tags": ["explicit_refund", "deadline"],
+    "expected": {"department": "billing", "urgency": 1, "refund_requested": true},
+    "texts": {
+      "es": "Cancelé la renovación y aun así me la cobraron. Solicito que me devuelvan ese dinero antes del viernes para cerrar las cuentas. El servicio sigue funcionando.",
+      "pt": "Cancelei a renovação e mesmo assim fui cobrado. Solicito o reembolso desse valor antes de sexta-feira para fechar as contas. O serviço continua funcionando.",
+      "en": "I canceled the renewal but was charged anyway. I request that money back before Friday to close the accounts. The service is still working."
+    }
+  },
+  {
+    "id": "07_thanks", "tags": ["no_request"],
+    "expected": {"department": "other", "urgency": 0, "refund_requested": false},
+    "texts": {
+      "es": "Muchas gracias a todo el equipo por la atención. Todo funciona bien. Este mensaje es solo para felicitarlos y no requiere ninguna acción.",
+      "pt": "Muito obrigado a toda a equipe pelo atendimento. Está tudo funcionando bem. Esta mensagem é apenas para parabenizá-los e não exige nenhuma ação.",
+      "en": "Many thanks to the whole team for your help. Everything works well. This message is only to congratulate you and requires no action."
+    }
+  },
+  {
+    "id": "08_privacy_request", "tags": ["outside_departments", "deadline"],
+    "expected": {"department": "other", "urgency": 1, "refund_requested": false},
+    "texts": {
+      "es": "Por favor, envíen este mensaje al responsable de privacidad. Quiero corregir mi dirección en sus registros esta semana. Puedo seguir usando la cuenta.",
+      "pt": "Por favor, encaminhem esta mensagem ao responsável pela privacidade. Quero corrigir meu endereço nos registros nesta semana. Posso continuar usando a conta.",
+      "en": "Please forward this message to the person responsible for privacy. I want to correct my address in your records this week. I can keep using the account."
+    }
+  },
+  {
+    "id": "09_login_typos", "tags": ["typos", "blocked"],
+    "expected": {"department": "technical", "urgency": 2, "refund_requested": false},
+    "texts": {
+      "es": "no puedo inisiar sesion, da error siempre. no tengo otra forma de entrar y estoy totalmente bloqueado para trabajar ahora.",
+      "pt": "nao consigo faser login, sempre da erro. nao tenho outra forma de entrar e estou totalmente impedido de trabalhar agora.",
+      "en": "cant loggin, it always gives an eror. i have no other way in and am completely blocked from working right now."
+    }
+  },
+  {
+    "id": "10_mixed_context", "tags": ["mixed_context", "resolved_issue", "deadline"],
+    "expected": {"department": "sales", "urgency": 1, "refund_requested": false},
+    "texts": {
+      "es": "El problema de la factura anterior ya está resuelto. Ahora queremos contratar veinte licencias nuevas. Necesito una propuesta comercial para mañana; mientras tanto seguimos trabajando.",
+      "pt": "O problema com a fatura anterior já foi resolvido. Agora queremos contratar vinte licenças novas. Preciso de uma proposta comercial para amanhã; enquanto isso continuamos trabalhando.",
+      "en": "The previous invoice problem is already resolved. We now want to buy twenty new licenses. I need a sales proposal by tomorrow; meanwhile we are continuing to work."
+    }
+  }
+]

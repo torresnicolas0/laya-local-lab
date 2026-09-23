@@ -1,0 +1,25 @@
+{
+  "department": {
+    "type": "choice",
+    "instructions": "Which department should handle this request?",
+    "criteria": {
+      "billing": "invoices, payments, duplicate charges and refunds",
+      "technical": "bugs, login failures and service outages",
+      "sales": "pricing, product information and new contracts",
+      "other": "requests outside these departments"
+    }
+  },
+  "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this request?",
+    "criteria": [
+      "Routine request; no deadline or blocked activity",
+      "Time-sensitive request, but activity can continue",
+      "Service is unusable or a critical activity is blocked right now"
+    ]
+  },
+  "refund_requested": {
+    "type": "noul",
+    "instructions": "Does the customer explicitly request a refund or their money back?"
+  }
+}

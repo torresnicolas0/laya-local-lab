@@ -1,0 +1,21 @@
+{
+  "cpu_reproduction_all_30_outputs_identical": true,
+  "offline_network_proof": "OS sandbox denied IPv4 and IPv6 connect with EPERM/EACCES",
+  "cpu_mps_all_30_categories_identical": true,
+  "max_cpu_mps_urgency_difference": 9.999999999998899e-05,
+  "unit_checks": {
+    "passed": 4,
+    "command": "python -m unittest -v"
+  },
+  "ui_checks": {
+    "successful_analysis": true,
+    "empty_input_rejected": true,
+    "unhandled_exceptions": 0
+  },
+  "installation_reproduction": "new .venv-repro from uv.lock using cached packages; no internet; reused pinned model snapshot",
+  "hardware": {
+    "chip": "Apple M1 Max",
+    "memory_gib": 32
+  },
+  "timing_note": "CPU and MPS measured sequentially; exploratory concurrent runs excluded. No other heavy task from this experiment ran during the measurements."
+}
